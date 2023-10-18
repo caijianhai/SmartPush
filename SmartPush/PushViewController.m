@@ -258,21 +258,29 @@
     NSString *token = [self.tokenTextField.stringValue stringByReplacingOccurrencesOfString:@" " withString:@""];
     
 
-    [[NetworkManager sharedManager] postWithPayload:self.payload.string
-                                            toToken:token
-                                          withTopic:_currentSec?_currentSec.topicName:@""
-                                           priority:self.prioritySegmentedControl.selectedTag
-                                         collapseID:@""
-                                        payloadType:self.payloadTypeButton.selectedItem.title
-                                          inSandbox:(self.devSelect == self.mode.selectedCell)
-                                         exeSuccess:^(id  _Nonnull responseObject) {
-        [self showMessage:@"发送成功"];
-        [self log:@"发送成功" warning:NO];
-    } exeFailed:^(NSString * _Nonnull error) {
-        [self showMessage:@"发送失败"];
-        [self log:error warning:YES];
-        [self log:@"发送失败" warning:YES];
-    }];
+    for (int i = 0; i< 10; ++i ) {
+        
+        NSArray *tokens = [token componentsSeparatedByString:@","];
+        for (NSString *t in tokens) {
+            [[NetworkManager sharedManager] postWithPayload:self.payload.string
+                                                    toToken:t
+                                                  withTopic:_currentSec?_currentSec.topicName:@""
+                                                   priority:self.prioritySegmentedControl.selectedTag
+                                                 collapseID:@""
+                                                payloadType:self.payloadTypeButton.selectedItem.title
+                                                  inSandbox:(self.devSelect == self.mode.selectedCell)
+                                                 exeSuccess:^(id  _Nonnull responseObject) {
+    //            [self showMessage:@"发送成功"];
+                [self log:[@"发送成功 --" stringByAppendingString:token] warning:NO];
+            } exeFailed:^(NSString * _Nonnull error) {
+    //            [self showMessage:@"发送失败"];
+                [self log:error warning:YES];
+                [self log:[@"发送失败 --" stringByAppendingString:token] warning:YES];
+            }];
+        }
+        
+    }
+    
 }
 //环境切换
 - (IBAction)modeSwitch:(id)sender {
