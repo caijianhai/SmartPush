@@ -257,23 +257,34 @@
     
     NSString *token = [self.tokenTextField.stringValue stringByReplacingOccurrencesOfString:@" " withString:@""];
     
+    NSArray *tokens = [token componentsSeparatedByString:@"\n"];
+    
+    for (int i = 0; i< 10; ++i) {
+        for (NSString *t in tokens) {
+            if(t.length == 0) {
+                continue;
+            }
+            [[NetworkManager sharedManager] postWithPayload:self.payload.string
+                                                    toToken:t
+                                                  withTopic:_currentSec?_currentSec.topicName:@""
+                                                   priority:self.prioritySegmentedControl.selectedTag
+                                                 collapseID:@""
+                                                payloadType:self.payloadTypeButton.selectedItem.title
+                                                  inSandbox:(self.devSelect == self.mode.selectedCell)
+                                                 exeSuccess:^(id  _Nonnull responseObject) {
+//                [self showMessage:@"发送成功"];
+                [self log:@"发送成功" warning:NO];
+            } exeFailed:^(NSString * _Nonnull error) {
+//                [self showMessage:@"发送失败"];
+                [self log:error warning:YES];
+                [self log:@"发送失败" warning:YES];
+            }];
+//            sleep(1);
+        }
+    }
+    
 
-    [[NetworkManager sharedManager] postWithPayload:self.payload.string
-                                            toToken:token
-                                          withTopic:_currentSec?_currentSec.topicName:@""
-                                           priority:self.prioritySegmentedControl.selectedTag
-                                         collapseID:@""
-                                        payloadType:self.payloadTypeButton.selectedItem.title
-                                          inSandbox:(self.devSelect == self.mode.selectedCell)
-                                         exeSuccess:^(id  _Nonnull responseObject) {
-        [self showMessage:@"发送成功"];
-        [self log:@"发送成功" warning:NO];
-    } exeFailed:^(NSString * _Nonnull error) {
-        [self showMessage:@"发送失败"];
-        [self log:error warning:YES];
-        [self log:@"发送失败" warning:YES];
-    }];
-}
+    }
 //环境切换
 - (IBAction)modeSwitch:(id)sender {
     [self resetConnect];
